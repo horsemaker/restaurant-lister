@@ -4,12 +4,21 @@ const express = require("express");
 const cors = require("cors");
 const db = require("./db");
 
+const path = require("path");
+
 const morgan = require("morgan");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// app.use(express.static("./client/build"));
+
+if (process.env.NODE_ENV === "production") {
+    // serve static content
+    app.use(express.static(path.join(__dirname, "client/build")));
+}
 
 // Get all restaurants
 app.get("/api/v1/restaurants", async (req, res) => {
@@ -132,6 +141,10 @@ app.post("/api/v1/restaurants/:id/addReview", async (req, res) => {
         console.log(err);
     }
 
+});
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client/build/index.html"));
 });
 
 const port = process.env.PORT || 3001;
